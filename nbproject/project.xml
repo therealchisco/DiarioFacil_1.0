@@ -5,7 +5,7 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>DiarioFacil_alpha</name>
             <source-roots>
-                <root id="src.dir"/>
+                <root id="src.diario.dir"/>
             </source-roots>
             <test-roots/>
         </data>
