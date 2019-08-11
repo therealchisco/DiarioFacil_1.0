@@ -3,47 +3,47 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.ulatina.diario;
+package diarioFacil;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
- * @author Laboratorio
+ * @author USER
  */
-public class Promocion implements IOfertas{
-    
+public class Combos implements IOfertas{
+    private int codCombo=0;
+    private String nombreCombo="";
     private List<Item> listaItems = new ArrayList<>();
+    private double precio=0;
     private boolean activo=false;
-    private double descuento = 0;
     
-    public Promocion(double descuento){
-        this.descuento = descuento;
+    public Combos() {
     }
     
-    private double aplicarDescuento(){
-        return 0;
+    public Combos(int cod, String nom){
+          this.codCombo=cod;
+          this.nombreCombo=nom;
     }
-    
-    public double aplicarDescuento(Item item){
-        double precioItem = item.getProd().getPrecio();
-        return aplicarDescuento(precioItem);
+
+    public int getCodCombo() {
+        return codCombo;
     }
-    
-    private double aplicarDescuento(double precioItem){
-        return precioItem - (precioItem * (descuento/100));
+
+    public void setCodCombo(int codCombo) {
+        this.codCombo = codCombo;
     }
-    
-    
-    
-    
-    
-    
-    /**
-     * Develve la lista de productos que estan en promicon/ tienen descuento
-     * @return 
-     */
+
+    public String getNombreCombo() {
+        return nombreCombo;
+    }
+
+    public void setNombreCombo(String nombreCombo) {
+        this.nombreCombo = nombreCombo;
+    }
+
     @Override
     public List<Item> getListaItems() {
         return listaItems;
@@ -59,6 +59,14 @@ public class Promocion implements IOfertas{
         listaItems.add(item);
     }
 
+    public double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
     @Override
     public boolean isActivo() {
         return activo;
@@ -68,5 +76,5 @@ public class Promocion implements IOfertas{
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
-  
+      
 }
