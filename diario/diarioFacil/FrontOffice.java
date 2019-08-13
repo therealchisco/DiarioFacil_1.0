@@ -516,7 +516,7 @@ do{
                                         + "3) Agregar una promoción al carrito  \n"
                                             +"4) Volver \n"));
                                     switch(op){
-                                        case 1://agregar producto al carrito
+                                        case 1:annadirProductoAlCarrito();
 
                                             break;
                                         case 2://agregar combo al carrito
@@ -540,7 +540,7 @@ do{
                                         + "2) Agregar un combo al carrtio  \n"
                                             +"3) Volver \n"));
                                     switch(op){
-                                        case 1://agregar producto al carrito
+                                        case 1:annadirProductoAlCarrito();
 
                                             break;
                                         case 2://agregar combo al carrito
