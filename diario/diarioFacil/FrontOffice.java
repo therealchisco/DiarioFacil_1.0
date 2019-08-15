@@ -8,12 +8,15 @@ package diarioFacil;
 
 
 import javax.swing.JOptionPane;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.ListIterator;
 
 /**
  *
  * @author Roberto
  */
-public class FrontOffice {
+public class FrontOffice implements IHistorial{
 int codFactura=0;
     Cliente client;    
     public void verProductos(){
@@ -139,9 +142,7 @@ int codFactura=0;
             }
         }while(opcion<0 ||formatoIncorrecto==true);
     }
-    
-    
-    
+
     // Fuck my life, yo hablando tanto de eficiencia y esto es peor que O(n^2) lol
     private boolean enPromocion(Producto p){
         boolean enPromocion = false;
@@ -178,45 +179,56 @@ int codFactura=0;
         }
         return p.getPrecio();
     }
-    
-    
-    // Genera la lista del carrito ajustando mostrando Productos en promocion si el cliente es Frecuente
-    private StringBuffer listaCarrito(boolean clienteFrecuente){
-           StringBuffer listaCarrito = new StringBuffer();
-           listaCarrito.append("Lista de productos \n");
-           
-           for(Factura f:DiarioFacil.getListaFacturas()){
-            for(Orden o:f.getListaOrdenes()){
-                  listaCarrito.append("Nombre: ");
-                  listaCarrito.append(o.getProducto().getNombreProd()); // Aqui mejor usare el 
-                  listaCarrito.append("\t Cantidad:");
-                  listaCarrito.append(o.getCantidad());
-                  listaCarrito.append("\t Precio:");
-                  
-                // DEPENDIENDO DE SI EL CLIENTE ES FRECUENTE O NO,
-                // MOSTRAMOS LOS PRECIOS CON DESCUENTO
-                  double precio = ajustarPrecio(o.getProducto(), clienteFrecuente);
-                  
-                  
-                  listaCarrito.append(precio); // Aqui mejor usar el getPrecio();
-                  listaCarrito.append("\t Subtotal:");
-                  listaCarrito.append(o.getSubtotal());
-                  listaCarrito.append("\n");
 
-            }
-           }
-           return listaCarrito;
+    private StringBuffer formatearFactura(Factura factura){
+
+        StringBuffer facturaFormateada = new StringBuffer();
+
+        facturaFormateada.append("Fecha: "+factura.getFechaString()+"\n");
+
+        for(Orden o : factura.getListaOrdenes()) {
+            facturaFormateada.append(formatearOrden(o));
+        }
+
+        facturaFormateada.append("=================================================\n");
+        return facturaFormateada;
     }
-    
-    
+
+    private StringBuffer formatearOrden(Orden o){
+        StringBuffer ordenFormateada = new StringBuffer();
+        ordenFormateada.append("Nombre: ");
+        ordenFormateada.append(o.getProducto().getNombreProd()); // Aqui mejor usare el
+        ordenFormateada.append("\t Cantidad:");
+        ordenFormateada.append(o.getCantidad());
+        ordenFormateada.append("\t Precio:");
+
+        // DEPENDIENDO DE SI EL CLIENTE ES FRECUENTE O NO,
+        // MOSTRAMOS LOS PRECIOS CON DESCUENTO
+        double precio = ajustarPrecio(o.getProducto(), this.client.isFrecuente());
+
+        ordenFormateada.append(precio); // Aqui mejor usar el getPrecio();
+        ordenFormateada.append("\t Subtotal:");
+        ordenFormateada.append(o.getSubtotal());
+        ordenFormateada.append("\n");
+        return ordenFormateada;
+    }
+
+
+
+    // Genera la lista del carrito ajustando mostrando Productos en promocion si el cliente es Frecuente
+    private StringBuffer listaCarrito(){
+        return formatearFactura(client.getCarrito());
+    }
+
+
+
+
     
     public void verCarrito(){
-        boolean clienteFrecuente = client.isFrecuente();
-        StringBuffer listaCarrito = listaCarrito(clienteFrecuente);
+        StringBuffer listaCarrito = listaCarrito();
         JOptionPane.showMessageDialog(null,listaCarrito);
     }
 
-    
     public void menu(){
         int op=0;
         do{
@@ -316,7 +328,6 @@ int codFactura=0;
         DiarioFacil.agregarUsuario(c);
         
     }
-        
     
     public void login(){
         int cedula=0;
@@ -437,7 +448,7 @@ int codFactura=0;
         }
     }
 
-public void verArticulos(){
+    public void verArticulos(){
     boolean formatoIncorrecto=false; 
     int op=0;
 do{
@@ -502,8 +513,8 @@ do{
                     }while(formatoIncorrecto==true);    
 }
 
-public void agregarACarrito(){
-    boolean formatoIncorrecto=false; 
+    public void agregarACarrito(){
+    boolean formatoIncorrecto=false;
     int op=0;
 do{
                         formatoIncorrecto=false;
@@ -516,8 +527,7 @@ do{
                                         + "3) Agregar una promoción al carrito  \n"
                                             +"4) Volver \n"));
                                     switch(op){
-                                        case 1:annadirProductoAlCarrito();
-
+                                        case 1://agregar producto al carrito
                                             break;
                                         case 2://agregar combo al carrito
                                             break;
@@ -540,7 +550,7 @@ do{
                                         + "2) Agregar un combo al carrtio  \n"
                                             +"3) Volver \n"));
                                     switch(op){
-                                        case 1:annadirProductoAlCarrito();
+                                        case 1://agregar producto al carrito
 
                                             break;
                                         case 2://agregar combo al carrito
@@ -566,7 +576,8 @@ do{
                         }
                     }while(formatoIncorrecto==true);    
 }  
-public void carrito(){
+
+    public void carrito(){
     boolean formatoIncorrecto=false;
     int op=0;
     
@@ -610,7 +621,8 @@ public void carrito(){
                         }
                     }while(formatoIncorrecto==true);
 }
-public void editarCarrito(){
+
+    public void editarCarrito(){
     boolean formatoIncorrecto=false;
     int op=0;
     
@@ -647,7 +659,7 @@ public void editarCarrito(){
                     }while(formatoIncorrecto==true);
 }
 
-public void historial(){
+    public void historial(){
     boolean formatoIncorrecto=false;
     int op=0;
     
@@ -689,7 +701,7 @@ public void historial(){
                     }while(formatoIncorrecto==true);
 }
 
-public void ultimaOrden(){
+    public void ultimaOrden(){
     boolean formatoIncorrecto=false;
     int op=0;
     
@@ -727,7 +739,7 @@ public void ultimaOrden(){
                     }while(formatoIncorrecto==true);
 }
 
-public void listaFacturas(){
+    public void listaFacturas(){
       boolean formatoIncorrecto=false;
     int op=0;
     
@@ -766,6 +778,58 @@ public void listaFacturas(){
 }
 
 
+
+    //Aqui solo nos interesa que el usuario vea su propio historial
+    //Por eso llamamos a la funcion del mismo nombre que requiere un parametro cedula,
+    // pasandole el del usuario que esta loggeado
+    @Override
+    public void verHistorial(){
+        StringBuffer historial = new StringBuffer();
+
+        ListIterator<Factura> iteradorFacturas = client.getHistorialDeFacturas().listIterator(client.getHistorialDeFacturas().size());
+
+        while(iteradorFacturas.hasPrevious()){
+            historial.append(formatearFactura(iteradorFacturas.previous()));
+        }
+
+        JOptionPane.showMessageDialog(null,historial);
+
+    }
+
+    @Override
+    public void verHistorialUsuario(int cedulaUsuario) {
+        verHistorial();
+    }
+
+    @Override
+    public void verHistorialFecha(Calendar fecha) {
+        StringBuffer historial = new StringBuffer();
+        ListIterator<Factura> iterador = client.getHistorialDeFacturas().listIterator(client.getHistorialDeFacturas().size());
+
+        while(iterador.hasPrevious()){
+            if(iterador.previous().getCalendar().equals(fecha)){
+                historial.append(iterador.previous());
+            }
+        }
+
+        JOptionPane.showConfirmDialog(null,historial);
+    }
+
+    @Override
+    public void verHistorialFecha(Calendar fechaInicio, Calendar fechaFin) {
+        StringBuffer historial = new StringBuffer();
+        ListIterator<Factura> iterador = client.getHistorialDeFacturas().listIterator(client.getHistorialDeFacturas().size());
+        Calendar fechaIterador = new GregorianCalendar();
+
+        while(iterador.hasPrevious()){
+            fechaIterador = iterador.previous().getCalendar();
+            if(fechaIterador.after(fechaInicio) && fechaIterador.before(fechaFin)){
+                historial.append(iterador.previous());
+            }
+        }
+
+        JOptionPane.showConfirmDialog(null,historial);
+    }
 
 }
 

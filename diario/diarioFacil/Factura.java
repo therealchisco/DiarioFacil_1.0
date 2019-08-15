@@ -83,5 +83,12 @@ public class Factura {
     public void agregarOrdenes(Orden o){
         listaOrdenes.add(o);
     }
-    
+
+    public String getFechaString(){
+        String fechaString;
+        sdf.setTimeZone(calendar.getTimeZone());
+        fechaString = sdf.format(calendar.getTime());
+        return fechaString;
+    }
+
 }
