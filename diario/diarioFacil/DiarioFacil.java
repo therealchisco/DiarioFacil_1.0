@@ -86,6 +86,19 @@ public class DiarioFacil {
         listaCombos.add(c);
 
     }
+
+    public static List<Promocion> getListaPromociones() {
+        return listaPromociones;
+    }
+
+    public static void setListaPromociones(List<Promocion> listaPromociones) {
+        DiarioFacil.listaPromociones = listaPromociones;
+    }
+    
+    public static void agregarPromociones(Promocion p){
+        listaPromociones.add(p);
+
+    }
     
     @Override
     public String toString() {

@@ -14,6 +14,7 @@ public class Orden {
     private Producto producto;
     private int cantidad;
     private double subtotal;
+    private Combos combo;
 
     public Orden() {
     }
@@ -24,6 +25,10 @@ public class Orden {
         this.subtotal = subtotal;
     }
 
+    public Orden(Combos combo) {
+        this.combo = combo;
+    }
+    
     public Producto getProducto() {
         return producto;
     }
@@ -47,4 +52,13 @@ public class Orden {
     public void setSubtotal(double subtotal) {
         this.subtotal = subtotal;
     }
+
+    public Combos getCombo() {
+        return combo;
+    }
+
+    public void setCombo(Combos combo) {
+        this.combo = combo;
+    }
+    
 }
