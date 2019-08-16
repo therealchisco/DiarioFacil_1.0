@@ -2265,4 +2265,5 @@ public class BackOffice implements IHistorial{
     public void verHistorialFecha(Calendar fechaInicio, Calendar fechaFin) {
 
     }
+
 }
