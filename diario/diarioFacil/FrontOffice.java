@@ -681,7 +681,56 @@ do{
                     }while(formatoIncorrecto==true);    
 }  
 
-    
+    public void verArticulosEnCarrito(){
+        StringBuffer lista = new StringBuffer();
+        int total=0;
+        lista.append("");
+           
+            for(Factura f:DiarioFacil.getListaFacturas()){
+                
+                if(codFactura==0){
+                    for(Orden o:f.getListaOrdenes()){
+                        if(o.getProducto()!=null){
+                            lista.append("Lista de productos \n");
+                            for(Orden or:f.getListaOrdenes()){
+                                lista.append("Producto: ");
+                                lista.append(or.getProducto().nombreProd);
+                                lista.append("\t Cantidad:");
+                                lista.append(or.getCantidad());
+                                lista.append("\t Subtotal:");
+                                lista.append(or.getSubtotal());
+                                total+=or.getSubtotal();
+                                lista.append("\n");
+                            }
+                        }
+                        if(o.getCombo()!=null){
+                            lista.append("Lista de combos \n");
+                            for(Orden or:f.getListaOrdenes()){
+                                lista.append("Nombre de Combo: ");
+                                lista.append(or.getCombo().getNombreCombo());
+                                lista.append("\nProductos en el combo:\n");
+                                for(Item it:or.getCombo().getListaItems()){
+                                    lista.append(it.getProd().nombreProd+"\t");
+                                }
+                                lista.append("\t Subtotal:");
+                                lista.append(or.getCombo().getPrecio());
+                                total+=or.getCombo().getPrecio();
+                                lista.append("\n");
+                            }
+                        }
+                        lista.append("Total: "+total);
+                    }
+
+                }
+              
+               
+            }
+            
+            if(lista.length()==0){
+                lista.append("Su carrito se encuentra vacio");
+            }
+            JOptionPane.showMessageDialog(null,lista);
+    }
     
     public void carrito(){
     boolean formatoIncorrecto=false;
@@ -701,7 +750,7 @@ do{
                                     switch(op){
                                         case 1:editarCarrito();
                                             break;
-                                        case 2://verArticulosEnCarrito();
+                                        case 2:verArticulosEnCarrito();
                                             break;
                                         case 3://limpiar carrito
                                             break;
