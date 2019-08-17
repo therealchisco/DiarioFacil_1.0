@@ -193,36 +193,38 @@ int codFactura=0;
                                 do{
                                     formatoIncorrecto=false;
                                     try{
-                                    String text="";
+                                        
                                     for(Item it:comb.getListaItems()){
                                         if(it.getCantidad()==0){
-                                            text+="No hay '"+it.getProd().nombreProd+"' para añadir al combo\n";
+                                            JOptionPane.showMessageDialog(null,"Hay articulos en el combo que no están disponibles");
+                                        }else{
+                                            confirm=Integer.parseInt(JOptionPane.showInputDialog
+                                            (null,"Combo: "+comb.getNombreCombo()+" Precio: "+comb.getPrecio()+"\n"
+                                            + "¿Está seguro de querer añadir este combo al carrito?\n"
+                                            + "(No=0 Si=1)")); 
+
+                                                if(confirm==1){
+                                                    comboEnviado = comb;
+                                                    if (DiarioFacil.listaFacturas.isEmpty()){
+                                                        Factura f = new Factura(client, codigoFactura);
+                                                        Orden o = new Orden(comboEnviado);
+                                                        f.agregarOrdenes(o);
+                                                        DiarioFacil.agregarFactura(f);
+                                                    }else{
+                                                        for(Factura f:DiarioFacil.listaFacturas){
+                                                            if(f.getCodFactura()==codigoFactura){
+                                                                Orden o = new Orden(comboEnviado);
+                                                                f.agregarOrdenes(o);
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                                JOptionPane.showMessageDialog(null,"Su orden ha sido añadida con éxito");
                                         }
                                     }
                                     
-                                    confirm=Integer.parseInt(JOptionPane.showInputDialog
-                                    (null,text+"Combo: "+comb.getNombreCombo()+" Precio: "+comb.getPrecio()+"\n"
-                                    + "¿Está seguro de querer añadir este combo al carrito?\n"
-                                    + "(No=0 Si=1)")); 
-
-                                        if(confirm==1){
-                                            comboEnviado = comb;
-                                            if (DiarioFacil.listaFacturas.isEmpty()){
-                                                Factura f = new Factura(client, codigoFactura);
-                                                Orden o = new Orden(comboEnviado);
-                                                f.agregarOrdenes(o);
-                                                DiarioFacil.agregarFactura(f);
-                                            }else{
-                                                for(Factura f:DiarioFacil.listaFacturas){
-                                                    if(f.getCodFactura()==codigoFactura){
-                                                        Orden o = new Orden(comboEnviado);
-                                                        f.agregarOrdenes(o);
-                                                    }
-                                                }
-                                            }
-
-                                        }
-                                        JOptionPane.showMessageDialog(null,"Su orden ha sido añadida con éxito");
+                                    
 
                                     }catch(NumberFormatException nfe){
                                         formatoIncorrecto=true;
