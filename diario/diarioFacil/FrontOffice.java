@@ -993,110 +993,19 @@ do{
 }
 
     public void agregarUltimaOrden(){
-        
-        StringBuffer historial = new StringBuffer();
-        
-        ListIterator<Factura> iterador = client.getHistorialDeFacturas().listIterator(client.getHistorialDeFacturas().size());
-
         boolean formatoIncorrecto=false, status=false;
-        Producto productoEnviado;
-        int codigoFactura=1, opcion=0,canti=0,confirm=0;
-        double montoTotal=0;
+        int codFactura=1, op=0, cant=0, confirm=0;
         do{
-            formatoIncorrecto=false;
-             
-            
-            while(iterador.hasNext()){
-                if(cedula == iterador.next().getCliente().cedula){
-                    try{
-                    opcion=Integer.parseInt(JOptionPane.showInputDialog
-                    (null,"Digite el código del producto que desea añadir"));
-                    for(Categoria c:DiarioFacil.getListaCategorias()){
-                        for(Producto p:c.getListaProductos()){
-                            if(opcion==p.codProducto){
-                                if(p.stockActual==0){
-                                    JOptionPane.showMessageDialog(null,"Ese producto se encuentra agotado");
-                                    formatoIncorrecto=true;
-                                }else{
-                                    do{
-                                        formatoIncorrecto=false;
-                                        try{
-                                        canti=Integer.parseInt(JOptionPane.showInputDialog
-                                        (null,"Ingrese la cantidad de '"+p.getNombreProd()+"' que desea añadir al carrito"));
-                                            if(canti>p.stockActual){
-                                                JOptionPane.showMessageDialog(null,"Se lograron añadir solo: "+p.stockActual+" unidades");
-                                                canti=p.stockActual;
-                                            }
-                                            do{
-                                                formatoIncorrecto=false;
-                                                try{
-                                                confirm=Integer.parseInt(JOptionPane.showInputDialog
-                                                (null,"Producto: "+p.nombreProd+" Cantidad: "+canti+" Precio: "+canti*p.precio+"\n"
-                                                + "¿Está seguro de querer añadir esta cantidad al carrito?\n"
-                                                + "(No=0 Si=1)")); 
+            for(Factura fact : DiarioFacil.listaFacturas){
+                for(Orden ord : fact.listaOrdenes){
+                    for(Categoria cat: DiarioFacil.listaCategorias){
+                        for(Producto prod: cat.getListaProductos()){
 
-                                                    if(confirm==1){
-                                                        productoEnviado = p;
-                                                        p.stockActual=p.stockActual-canti;
-                                                        montoTotal = canti*p.precio;
-                                                        if (DiarioFacil.listaFacturas.isEmpty()){
-                                                            Factura f = new Factura(client, codigoFactura);
-                                                            Orden o = new Orden(productoEnviado, canti, montoTotal);
-                                                            f.agregarOrdenes(o);
-                                                            DiarioFacil.agregarFactura(f);
-                                                        }else{
-                                                            for(Factura f:DiarioFacil.listaFacturas){
-                                                                for(Orden ord:f.listaOrdenes){
-                                                                    if(ord.getProducto()==p){
-                                                                        status=true;
-                                                                    }
-                                                                }
-                                                                if(f.getCodFactura()==codigoFactura && status==true){
-                                                                    for(Orden ord:f.listaOrdenes){
-                                                                        if(ord.getProducto()==p){
-                                                                            ord.setCantidad(ord.getCantidad()+canti);
-                                                                            ord.setSubtotal(p.precio*ord.getCantidad());
-                                                                        }
-                                                                    }
-                                                                }else{
-                                                                    Orden o = new Orden(productoEnviado, canti, montoTotal);
-                                                                    f.agregarOrdenes(o);
-                                                                }
-                                                            }
-                                                        }
-
-                                                    }
-                                                    JOptionPane.showMessageDialog(null,"Su orden ha sido añadida con éxito");
-
-                                                }catch(NumberFormatException nfe){
-                                                    formatoIncorrecto=true;
-                                                    JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
-                                                }
-                                            }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
-
-                                        }catch(NumberFormatException nfe){
-                                        formatoIncorrecto=true;
-                                        JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
-                                        }
-
-
-                                    }while(canti<=0 ||formatoIncorrecto==true);
-                                }
-                           }
                         }
-                    }
-
-                    }catch(NumberFormatException nfe){
-                        formatoIncorrecto=true;
-                        JOptionPane.showMessageDialog
-                        (null,"La opción ingresada no tiene el formato correcto"+
-                               ", recuerde usar solo números");
                     }
                 }
             }
-            
-            
-        }while(opcion<0 ||formatoIncorrecto==true);
+        }while(op<0 || formatoIncorrecto==true);
     }
 
     //Aqui solo nos interesa que el usuario vea su propio historial
