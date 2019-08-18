@@ -484,7 +484,7 @@ int codFactura=0;
                                            historial();
                                             break;
                                         case 5:
-                                            cambiarContraseña();
+                                            cambiarContrasenna();
                                             break;
                                         case 6:
                                            
@@ -513,7 +513,7 @@ int codFactura=0;
         }while(usuarioExistente==false);
     }
     
-    public void cambiarContraseña(){
+    public void cambiarContrasenna(){
         String contraold="";
         String contranew="";
         String respuesta=""; 
