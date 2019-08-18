@@ -1051,7 +1051,6 @@ do{
                                 do {
                                     formatoIncorrecto = false;
                                     try {
-                                        cant = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese la cantidad de '" + p.getNombreProd() + "' que desea añadir al carrito"));
                                         if (cant > p.stockActual) {
                                             JOptionPane.showMessageDialog(null, "Se lograron añadir solo: " + p.stockActual + " unidades");
                                             cant = p.stockActual;
