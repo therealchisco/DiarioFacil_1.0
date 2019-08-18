@@ -954,7 +954,7 @@ do{
                                     + " números enteros ");
                         }
                     }while(formatoIncorrecto==true);
-}
+    }
 
     public void listaFacturas(){
       boolean formatoIncorrecto=false;
@@ -1002,12 +1002,104 @@ do{
                 for(Orden ord : fact.listaOrdenes){
                     for(Categoria cat: DiarioFacil.listaCategorias){
                         for(Producto prod: cat.getListaProductos()){
-
+                            if(fact.getCliente().cedula==cedula){
+                                annadirUltProductosAlCarrito(ord.getProducto().codProducto, ord.getCantidad());
+                            }else{
+                                JOptionPane.showMessageDialog(null, "No ha realizado compras");
+                            }
                         }
                     }
                 }
             }
         }while(op<0 || formatoIncorrecto==true);
+    }
+    
+    public void annadirUltProductosAlCarrito(int cod, int cant) {
+        boolean formatoIncorrecto = false, status = false;
+        Producto productoEnviado;
+        int codigoFactura = 1, confirm = 0;
+        double montoTotal = 0;
+        do {
+            formatoIncorrecto = false;
+
+            try {
+                for (Categoria c : DiarioFacil.getListaCategorias()) {
+                    for (Producto p : c.getListaProductos()) {
+                        if (cod == p.codProducto) {
+                            if (p.stockActual == 0) {
+                                JOptionPane.showMessageDialog(null, "Ese producto se encuentra agotado");
+                                formatoIncorrecto = true;
+                            } else {
+                                do {
+                                    formatoIncorrecto = false;
+                                    try {
+                                        cant = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese la cantidad de '" + p.getNombreProd() + "' que desea añadir al carrito"));
+                                        if (cant > p.stockActual) {
+                                            JOptionPane.showMessageDialog(null, "Se lograron añadir solo: " + p.stockActual + " unidades");
+                                            cant = p.stockActual;
+                                        }
+                                        do {
+                                            formatoIncorrecto = false;
+                                            try {
+                                                confirm = Integer.parseInt(JOptionPane.showInputDialog(null, "Producto: " + p.nombreProd + " Cantidad: " + cant + " Precio: " + cant * p.precio + "\n"
+                                                        + "¿Está seguro de querer añadir esta cantidad al carrito?\n"
+                                                        + "(No=0 Si=1)"));
+
+                                                if (confirm == 1) {
+                                                    productoEnviado = p;
+                                                    montoTotal = cant * p.precio;
+                                                    if (DiarioFacil.listaFacturas.isEmpty()) {
+                                                        Factura f = new Factura(client, codigoFactura);
+                                                        Orden o = new Orden(productoEnviado, cant, montoTotal);
+                                                        f.agregarOrdenes(o);
+                                                        DiarioFacil.agregarFactura(f);
+                                                    } else {
+                                                        for (Factura f : DiarioFacil.listaFacturas) {
+                                                            for (Orden ord : f.listaOrdenes) {
+                                                                if (ord.getProducto() == p) {
+                                                                    status = true;
+                                                                }
+                                                            }
+                                                            if (f.getCodFactura() == codigoFactura && status == true) {
+                                                                for (Orden ord : f.listaOrdenes) {
+                                                                    if (ord.getProducto() == p) {
+                                                                        ord.setCantidad(ord.getCantidad() + cant);
+                                                                        ord.setSubtotal(p.precio * ord.getCantidad());
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                Orden o = new Orden(productoEnviado, cant, montoTotal);
+                                                                f.agregarOrdenes(o);
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                                JOptionPane.showMessageDialog(null, "Su orden ha sido añadida con éxito");
+
+                                            } catch (NumberFormatException nfe) {
+                                                formatoIncorrecto = true;
+                                                JOptionPane.showMessageDialog(null, "La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                            }
+                                        } while (confirm < 0 || confirm > 1 || formatoIncorrecto == true);
+
+                                    } catch (NumberFormatException nfe) {
+                                        formatoIncorrecto = true;
+                                        JOptionPane.showMessageDialog(null, "La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                    }
+
+                                } while (cant <= 0 || formatoIncorrecto == true);
+                            }
+                        }
+                    }
+                }
+
+            } catch (NumberFormatException nfe) {
+                formatoIncorrecto = true;
+                JOptionPane.showMessageDialog(null, "La opción ingresada no tiene el formato correcto"
+                        + ", recuerde usar solo números");
+            }
+        } while (cod < 0 || formatoIncorrecto == true);
     }
 
     //Aqui solo nos interesa que el usuario vea su propio historial
