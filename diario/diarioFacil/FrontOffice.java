@@ -997,7 +997,23 @@ do{
     public void agregarUltimaOrden(){
         boolean formatoIncorrecto=false, status=false;
         int codFactura=1, op=0, cant=0, confirm=0;
-        do{
+        boolean vacio=false;
+        
+        StringBuffer historial = new StringBuffer();
+        
+        ListIterator<Factura> iterador = client.getHistorialDeFacturas().listIterator(client.getHistorialDeFacturas().size());
+
+        while(iterador.hasNext()){
+            if(cedula == iterador.next().getCliente().cedula){
+                iterador.next().getListaOrdenes();
+            }
+        }
+        
+        if(historial.toString().equals("")){
+            vacio=true;
+        }
+        
+        if(vacio==false){
             for(Factura fact : DiarioFacil.listaFacturas){
                 for(Orden ord : fact.listaOrdenes){
                     for(Categoria cat: DiarioFacil.listaCategorias){
@@ -1011,7 +1027,9 @@ do{
                     }
                 }
             }
-        }while(op<0 || formatoIncorrecto==true);
+        }else{
+            JOptionPane.showMessageDialog(null, "No hay compras en el historial");
+        }
     }
     
     public void annadirUltProductosAlCarrito(int cod, int cant) {
