@@ -397,7 +397,7 @@ int codFactura=0;
                 try{
                     contra=JOptionPane.showInputDialog(null,"Ingrese una contraseña");
                     validarContrasenna(contra);
-                }catch(DiarioContraseñaException dce){
+                }catch(DiarioContrasennaException dce){
                     System.out.print(dce.getMessage());
                 }
                 if(contra.length()<4){
@@ -548,9 +548,9 @@ int codFactura=0;
         }while(usuarioExistente==false);
     }
     
-    public static void validarContrasenna(String contrasenna)  throws DiarioContraseñaException{
+    public static void validarContrasenna(String contrasenna)  throws DiarioContrasennaException{
         if(contrasenna.length()<4){
-            throw new DiarioContraseñaException("La contraseña es muy corta, ingrese una más segura \n");
+            throw new DiarioContrasennaException("La contraseña es muy corta, ingrese una más segura \n");
         }
     }
 

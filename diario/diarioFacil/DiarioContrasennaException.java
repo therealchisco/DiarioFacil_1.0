@@ -11,22 +11,22 @@ package diarioFacil;
  *
  * @author USER
  */
-public class DiarioContraseñaException extends Exception {
+public class DiarioContrasennaException extends Exception {
 
     /**
-     * Creates a new instance of <code>DiarioContraseñaException</code> without
+     * Creates a new instance of <code>DiarioContrasennaException</code> without
      * detail message.
      */
-    public DiarioContraseñaException() {
+    public DiarioContrasennaException() {
     }
 
     /**
-     * Constructs an instance of <code>DiarioContraseñaException</code> with the
+     * Constructs an instance of <code>DiarioContrasennaException</code> with the
      * specified detail message.
      *
      * @param msg the detail message.
      */
-    public DiarioContraseñaException(String msg) {
+    public DiarioContrasennaException(String msg) {
         super(msg);
     }
 }
