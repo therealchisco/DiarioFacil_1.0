@@ -90,5 +90,9 @@ public class Factura {
         fechaString = sdf.format(calendar.getTime());
         return fechaString;
     }
-
+    
+    public void eliminarOrdenes(){
+        listaOrdenes.removeAll(listaOrdenes);
+    }
+    
 }
