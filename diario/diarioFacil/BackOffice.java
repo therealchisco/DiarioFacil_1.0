@@ -8,6 +8,8 @@ package diarioFacil;
 
 import javax.swing.JOptionPane;
 import java.util.*;
+import java.util.Calendar;
+import java.util.Iterator;
 
 /**
  *

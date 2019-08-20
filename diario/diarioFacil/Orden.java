@@ -25,7 +25,6 @@ public class Orden {
         this.subtotal = subtotal;
     }
 
-
     public Orden(Combos combo) {
         this.combo = combo;
     }

@@ -108,6 +108,11 @@ public class DiarioFacil {
         listaPromociones.add(p);
 
     }
+    
+    public static void agregarPromociones(Promocion p){
+        listaPromociones.add(p);
+
+    }
 
     public static void eliminarPromocion(int posicion){
         listaPromociones.remove(posicion);

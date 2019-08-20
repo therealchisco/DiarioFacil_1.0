@@ -241,9 +241,6 @@ private int validarCantidadProducto(Producto producto){
 }
 
 
-
-
-
 public void annadirComboAlCarrito(){
     boolean formatoIncorrecto=false, status=false;
     Combos comboEnviado;
@@ -279,7 +276,8 @@ public void annadirComboAlCarrito(){
                                         + "(No=0 Si=1)"));
 
                                             if(confirm==1){
-                                                comboEnviado = comb;
+                                                productoEnviado = p;
+                                                montoTotal = canti*p.precio;
                                                 if (DiarioFacil.listaFacturas.isEmpty()){
                                                     Factura f = new Factura(client, codigoFactura);
                                                     Orden o = new Orden(comboEnviado);
@@ -324,6 +322,89 @@ public void annadirComboAlCarrito(){
         }
     }while(opcion<0 ||formatoIncorrecto==true);
     }
+
+    /*
+    public void annadirComboAlCarrito(){
+        boolean formatoIncorrecto=false, status=false;
+        Combos comboEnviado;
+        int codigoFactura=1, opcion=0,canti=0,confirm=0;
+        double montoTotal=0;
+        do{
+            formatoIncorrecto=false;
+             
+            try{
+            opcion=Integer.parseInt(JOptionPane.showInputDialog
+            (null,"Digite el código del combo que desea añadir"));
+            for(Combos comb:DiarioFacil.getListaCombos()){
+                
+                    if(opcion==comb.getCodCombo()){
+                        if(comb.isActivo()==false){
+                            JOptionPane.showMessageDialog(null,"Ese combo no está disponible");
+                            formatoIncorrecto=true;
+                        }else{
+                            do{
+                                formatoIncorrecto=false;
+                                
+                                do{
+                                    formatoIncorrecto=false;
+                                    try{
+                                        
+                                    for(Item it:comb.getListaItems()){
+                                        if(it.getCantidad()==0){
+                                            JOptionPane.showMessageDialog(null,"Hay articulos en el combo que no están disponibles");
+                                        }else{
+                                            confirm=Integer.parseInt(JOptionPane.showInputDialog
+                                            (null,"Combo: "+comb.getNombreCombo()+" Precio: "+comb.getPrecio()+"\n"
+                                            + "¿Está seguro de querer añadir este combo al carrito?\n"
+                                            + "(No=0 Si=1)")); 
+
+                                                if(confirm==1){
+                                                    comboEnviado = comb;
+                                                    if (DiarioFacil.listaFacturas.isEmpty()){
+                                                        Factura f = new Factura(client, codigoFactura);
+                                                        Orden o = new Orden(comboEnviado);
+                                                        f.agregarOrdenes(o);
+                                                        DiarioFacil.agregarFactura(f);
+                                                    }else{
+                                                        for(Factura f:DiarioFacil.listaFacturas){
+                                                            if(f.getCodFactura()==codigoFactura){
+                                                                Orden o = new Orden(comboEnviado);
+                                                                f.agregarOrdenes(o);
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                                JOptionPane.showMessageDialog(null,"Su orden ha sido añadida con éxito");
+                                        }
+                                    }
+                                    
+                                    
+
+                                    }catch(NumberFormatException nfe){
+                                        formatoIncorrecto=true;
+                                        JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                    }
+                                }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
+
+                                
+
+
+                            }while(canti<=0 ||formatoIncorrecto==true);
+                        }
+                   }
+                
+            }
+              
+            }catch(NumberFormatException nfe){
+                formatoIncorrecto=true;
+                JOptionPane.showMessageDialog
+                (null,"La opción ingresada no tiene el formato correcto"+
+                       ", recuerde usar solo números");
+            }
+        }while(opcion<0 ||formatoIncorrecto==true);
+    }
+    */
     
     // Fuck my life, yo hablando tanto de eficiencia y esto es peor que O(n^2) lol
     private boolean enPromocion(Producto p){
@@ -378,28 +459,21 @@ public void annadirComboAlCarrito(){
 
     private StringBuffer formatearOrden(Orden o){
         StringBuffer ordenFormateada = new StringBuffer();
-        if(o.getProducto().equals(null)){
-            ordenFormateada.append("Nombre: "+o.getProducto().getNombreProd());
-            ordenFormateada.append("\t Cantidad:");
-            ordenFormateada.append(o.getCantidad());
-            ordenFormateada.append("\t Precio:");
-            double precio = ajustarPrecio(o.getProducto(), this.client.isFrecuente());
-            ordenFormateada.append(precio); // Aqui mejor usar el getPrecio();
-            ordenFormateada.append("\t Subtotal:");
-            ordenFormateada.append(o.getSubtotal());
-            ordenFormateada.append("\n");
-        }
-        if(o.getCombo().equals(null)){
-            ordenFormateada.append("Combo: " + o.getCombo().getNombreCombo());
-            ordenFormateada.append("\t Precio:");
-            ordenFormateada.append(o.getCombo().getPrecio());
-        }
+        ordenFormateada.append("Nombre: ");
+        ordenFormateada.append(o.getProducto().getNombreProd()); // Aqui mejor usare el
+        ordenFormateada.append("\t Cantidad:");
+        ordenFormateada.append(o.getCantidad());
+        ordenFormateada.append("\t Precio:");
 
         // DEPENDIENDO DE SI EL CLIENTE ES FRECUENTE O NO,
         // MOSTRAMOS LOS PRECIOS CON DESCUENTO
         double precio = ajustarPrecio(o.getProducto(), this.client.isFrecuente());
 
-       return ordenFormateada;
+        ordenFormateada.append(precio); // Aqui mejor usar el getPrecio();
+        ordenFormateada.append("\t Subtotal:");
+        ordenFormateada.append(o.getSubtotal());
+        ordenFormateada.append("\n");
+        return ordenFormateada;
     }
 
 
@@ -408,6 +482,9 @@ public void annadirComboAlCarrito(){
     private StringBuffer listaCarrito(){
         return formatearFactura(client.getCarrito());
     }
+
+
+
 
     
     public void verCarrito(){
@@ -806,11 +883,9 @@ do{
                                         case 1:
                                             verProductos();
                                             break;
-                                        case 2:
-                                            verCombos();
+                                        case 2:verCombos();
                                             break;
-                                        case 3:
-                                            verPromociones();
+                                        case 3:verPromociones();
                                             break;
                                         case 4:
                                           
@@ -1053,8 +1128,7 @@ do{
                                         case 1:
                                             editarCarrito();
                                             break;
-                                        case 2:
-                                            verArticulosEnCarrito();
+                                        case 2:verArticulosEnCarrito();
                                             break;
                                         case 3:
                                             client.limpiarCarrito();
@@ -1294,9 +1368,9 @@ do{
                                             +"3) Volver \n"));
                                     switch(op){
                                         case 1:
-                                            verUltimaOrden2();
+                                            verUltimaOrden();
                                             break;
-                                        case 2:repetirUlimaCompra();
+                                        case 2:agregarUltimaOrden();
                                             break;
                                         case 3:
                                             break;

@@ -54,6 +54,8 @@ public class Cliente extends Usuario{
     public List<Factura> getHistorialDeFacturas(){
         updateFacturas();
         return historialDeFacturas;
+    public void agregarOrdenAHistorial(Orden orden){
+        historialDeOrdenes.add(orden);
     }
 
     public boolean isFrecuente() {
