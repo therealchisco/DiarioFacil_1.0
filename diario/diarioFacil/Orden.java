@@ -61,14 +61,4 @@ public class Orden {
         this.combo = combo;
     }
     
-    public void eliminarProductos(){
-        this.producto = null;
-        this.cantidad = 0;
-        this.subtotal = 0;
-    }
-    
-    public void eliminarCombos(){
-        this.combo = null;
-    }
-    
 }
