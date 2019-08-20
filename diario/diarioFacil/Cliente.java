@@ -6,6 +6,7 @@
 package diarioFacil;
 
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class Cliente extends Usuario{
     private String respuestaSeguridad="";
     private List<Factura> historialDeFacturas = new ArrayList<>(); // Una Factura es una Compra (Coleccion de Ordenes)
     private List<Orden> historialDeOrdenes= new ArrayList<>(); // Una Orden es una cantidad n de Productos
-    private Factura carrito = new Factura(); // El Carrito es la Compra
+    private Factura carrito = new Factura(this,DiarioFacil.codigoFactura); // El Carrito es la Compra
 
 
     /** CONSTRUCTORES
@@ -88,14 +89,22 @@ public class Cliente extends Usuario{
     }
 
 
-
+    public Factura getUltimaCompra(){
+        return historialDeFacturas.get(cantidadCompras);
+    }
 
     public void limpiarCarrito(){
-        carrito = new Factura();
+        carrito = new Factura(this,DiarioFacil.codigoFactura);
     }
 
     private void agregarAlCarrito(Orden orden){
         carrito.agregarOrdenes(orden);
+    }
+
+    public void repetirOrden(){
+        limpiarCarrito();
+        Factura ultima = getUltimaCompra();
+        carrito.agregarOrdenes(ultima.getListaOrdenes());
     }
 
     public void completarCarrito(){
@@ -105,23 +114,36 @@ public class Cliente extends Usuario{
         actualizarCompras();
     }
 
+    public void cambiarCantidad(int posicion){
+        int cantidad = -1;
+        while(cantidad< 1){
+           cantidad = inputInt("Ingrese Nueva Cantidad");
+        }
+        carrito.getListaOrdenes().get(posicion).setCantidad(cantidad);
+        JOptionPane.showMessageDialog(null,"Cantidad Modificada con Exito");
+    }
+
+
+    private int inputInt(String mensaje){
+        int input = 0;
+        try{
+            input = Integer.parseInt(JOptionPane.showInputDialog(mensaje));
+        }catch (NumberFormatException e){
+            JOptionPane.showMessageDialog(null,"Por Favor Ingrese un numero Entero","Formato Incorrecto",JOptionPane.ERROR_MESSAGE);
+            return inputInt(mensaje);
+        }
+
+        return input;
+    }
+
+    public void agregarOrdenACarrito(Orden orden){
+        carrito.agregarOrdenes(orden);
+    }
 
     private void actualizarCompras(){
         cantidadCompras = historialDeFacturas.size();
         frecuente = cantidadCompras>=5;
     }
-
-    /*
-
-    d88888b db    db d888888b .d8888. d888888b d88888b d8b   db d888888b d88888b
-    88'     `8b  d8'   `88'   88'  YP `~~88~~' 88'     888o  88 `~~88~~' 88'
-    88ooooo  `8bd8'     88    `8bo.      88    88ooooo 88V8o 88    88    88ooooo
-    88~~~~~  .dPYb.     88      `Y8b.    88    88~~~~~ 88 V8o88    88    88~~~~~
-    88.     .8P  Y8.   .88.   db   8D    88    88.     88  V888    88    88.
-    Y88888P YP    YP Y888888P `8888Y'    YP    Y88888P VP   V8P    YP    Y88888P
-
-     */
-
 
     private void updateFacturas(){
         List<Factura> temp = new ArrayList<>();
@@ -145,16 +167,9 @@ public class Cliente extends Usuario{
         return temp;
     }
 
-
-
-
-
-
-
     public void agregarOrdenAHistorial(Orden orden){
         historialDeOrdenes.add(orden);
     }
-
 
     @Override
     public String toString() {

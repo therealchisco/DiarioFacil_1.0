@@ -84,6 +84,10 @@ public class Factura {
         listaOrdenes.add(o);
     }
 
+    public void agregarOrdenes(List<Orden> lista){
+        listaOrdenes.addAll(lista);
+    }
+
     public String getFechaString(){
         String fechaString;
         sdf.setTimeZone(calendar.getTimeZone());

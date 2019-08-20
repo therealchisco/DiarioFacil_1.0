@@ -23,6 +23,11 @@ public class DiarioFacil {
     public static List<Combos> listaCombos=new ArrayList<>();
     public static List<Promocion> listaPromociones = new ArrayList();
 
+    public static int codigoFactura = 0;
+
+    private static void actualizarCodigoFactura(){
+        codigoFactura = listaFacturas.size();
+    }
 
     public DiarioFacil() {
     }
@@ -69,10 +74,13 @@ public class DiarioFacil {
 
     public static void setListaFacturas(List<Factura> listaFacturas) {
         DiarioFacil.listaFacturas = listaFacturas;
+        DiarioFacil.actualizarCodigoFactura();
     }
+
       
     public static void agregarFactura(Factura f){
         listaFacturas.add(f);
+        actualizarCodigoFactura();
     }
     
     public static List<Combos> getListaCombos() {
