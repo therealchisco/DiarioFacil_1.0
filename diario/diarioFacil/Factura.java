@@ -83,5 +83,23 @@ public class Factura {
     public void agregarOrdenes(Orden o){
         listaOrdenes.add(o);
     }
-    
+
+    public String getFechaString(){
+        String fechaString;
+        sdf.setTimeZone(calendar.getTimeZone());
+        fechaString = sdf.format(calendar.getTime());
+        return fechaString;
+    }
+
+    /*_____                _     _
+     / ____|              | |   (_)
+    | |     __ _ _ __ ___ | |__  _  ___  ___
+    | |    / _` | '_ ` _ \| '_ \| |/ _ \/ __|
+    | |___| (_| | | | | | | |_) | | (_) \__ \
+     \_____\__,_|_| |_| |_|_.__/|_|\___/|___/*/
+
+    @Override
+    public String toString() {
+        return "Factura #" + codFactura + " " + cliente.toString() + " " + getFechaString();
+    }
 }

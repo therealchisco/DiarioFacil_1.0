@@ -5,9 +5,9 @@
  */
 package diarioFacil;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -87,7 +87,36 @@ public class DiarioFacil {
         listaCombos.add(c);
 
     }
+
+    public static List<Promocion> getListaPromociones() {
+        return listaPromociones;
+    }
+
+    public static void setListaPromociones(List<Promocion> listaPromociones) {
+        DiarioFacil.listaPromociones = listaPromociones;
+    }
     
+    public static void agregarPromociones(Promocion p){
+        listaPromociones.add(p);
+
+    }
+
+    public static void eliminarPromocion(int posicion){
+        listaPromociones.remove(posicion);
+        mostrar("El elemento "+posicion+" ha sido removido con exito");
+    }
+
+    public static void cambiarActivoInactivo(int posicion){
+        listaPromociones.get(posicion).cambiarEstado();
+        String activa = listaPromociones.get(posicion).estaActiva();
+        mostrar("La promocion numero "+posicion+" ahora está " + activa );
+    }
+
+    public static void ajustarDescuento(int posicion, int porcentaje){
+        listaPromociones.get(posicion).setDescuento(porcentaje);
+        mostrar("El descuento de la Promocion "+posicion+" ha sido ajustado a "+porcentaje+"%");
+    }
+
     @Override
     public String toString() {
         String memo="";
@@ -96,6 +125,13 @@ public class DiarioFacil {
         }
         return "DiarioFacil " + memo;
     }
-    
+
+    private static void mostrar(String mensaje){
+        JOptionPane.showMessageDialog(null,mensaje);
+    }
+
+    private static void mostrar(StringBuffer mensaje){
+        JOptionPane.showMessageDialog(null,mensaje);
+    }
     
 }

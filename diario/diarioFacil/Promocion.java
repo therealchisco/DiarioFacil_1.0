@@ -31,6 +31,10 @@ public class Promocion implements IOfertas{
         double precioItem = item.getProd().getPrecio();
         return aplicarDescuento(precioItem);
     }
+
+    public void setDescuento(double descuento){
+        this.descuento=descuento;
+    }
     
     private double aplicarDescuento(double precioItem){
         return precioItem - (precioItem * (descuento/100));
@@ -69,5 +73,29 @@ public class Promocion implements IOfertas{
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
-  
+
+    private String listaDeItemsEnPromocion(){
+        String listaDeItemsEnPromocion = "items = [ ";
+        for(Item item: listaItems){
+            listaDeItemsEnPromocion+=item.getProd()+", ";
+        }
+        return listaDeItemsEnPromocion + "]";
+    }
+
+    public String estaActiva(){
+        if(activo){
+            return "Activa";
+        }else{
+            return "Desactivada";
+        }
+    }
+
+    public void cambiarEstado(){
+        activo = !activo;
+    }
+
+    @Override
+    public String toString() {
+        return "Promocion de "+descuento+"% "+estaActiva()+" "+listaDeItemsEnPromocion()+"\n";
+    }
 }
