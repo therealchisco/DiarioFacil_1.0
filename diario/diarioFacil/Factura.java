@@ -106,4 +106,9 @@ public class Factura {
     public String toString() {
         return "Factura #" + codFactura + " " + cliente.toString() + " " + getFechaString();
     }
+    
+    public void eliminarOrdenes(){
+        listaOrdenes.removeAll(listaOrdenes);
+    }
+    
 }
