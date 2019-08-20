@@ -7,6 +7,7 @@ package diarioFacil;
 
 
 import javax.swing.JOptionPane;
+import java.util.*;
 import java.util.Calendar;
 import java.util.Iterator;
 
@@ -1150,48 +1151,48 @@ public class BackOffice implements IHistorial{
                             }
 
     public void mantenimientoClientes(){
-                                   int opcion=0;
+        int opcion=0;
 
-                                   boolean formatoCorrecto=true;
+        boolean formatoCorrecto=true;
 
-                                   do{
-                                   formatoCorrecto=true;
-                                   try{
+        do{
+            formatoCorrecto=true;
+            try{
 
-                                   opcion=Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese la opción \n"+
-                                   "1.Ver lista de clientes \n"+
-                                   "2.Dar o revocar condición de frecuente \n"+
-                                   "3.Borrar cliente \n"+
-                                   "4.Volver \n"));
+                opcion=Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese la opción \n"+
+                        "1.Ver lista de clientes \n"+
+                        "2.Dar o revocar condición de frecuente \n"+
+                        "3.Borrar cliente \n"+
+                        "4.Volver \n"));
 
-                                   }catch(NumberFormatException nfe){
+            }catch(NumberFormatException nfe){
 
-                                   formatoCorrecto=false;
+                formatoCorrecto=false;
 
-                                   JOptionPane.showMessageDialog(null,"la opción ingresada no tiene el formato correcto");
+                JOptionPane.showMessageDialog(null,"la opción ingresada no tiene el formato correcto");
 
-                                   }
-                                   }while(formatoCorrecto==false ||opcion<1 ||opcion>4);
+            }
+        }while(formatoCorrecto==false ||opcion<1 ||opcion>4);
 
-                                   switch(opcion){
+        switch(opcion){
 
-                                   case 1: listaClientes();
-                                   break;
+            case 1: listaClientes();
+                break;
 
-                                   case 2: controlarFrecuente();
-                                   break;
+            case 2: controlarFrecuente();
+                break;
 
-                                   case 3: borrarCliente();
-                                   break;
+            case 3: borrarCliente();
+                break;
 
-                                   case 4:
-                                   break;
+            case 4:
+                break;
 
 
 
-                                   }
+        }
 
-                                   }
+    }
 
     public void listaClientes(){
                            StringBuffer lista = new StringBuffer();
@@ -2246,24 +2247,431 @@ public class BackOffice implements IHistorial{
                          }while(comboExiste==false);
                          }
 
+
+    /*_____                _     _
+     / ____|              | |   (_)
+    | |     __ _ _ __ ___ | |__  _  ___  ___
+    | |    / _` | '_ ` _ \| '_ \| |/ _ \/ __|
+    | |___| (_| | | | | | | |_) | | (_) \__ \
+     \_____\__,_|_| |_| |_|_.__/|_|\___/|___/*/
+
+    /** FORMATEA TODAS LAS PROMOCIONES ACTIVAS EN EL SISTEMA PARA PODER IMPRIMIRLAS LUEGO
+     * @return StringBuffer CON TODAS LAS PROMOCIONES ACTIVAS
+     */
+    private StringBuffer getPromociones(){
+        StringBuffer promociones= new StringBuffer();
+        int i = 0;
+        for(Promocion promocion: DiarioFacil.getListaPromociones()){
+            promociones.append(promocion.toString());
+            i++;
+        }
+        return promociones;
+    }
+
+    private void verPromociones(){
+        StringBuffer promociones = getPromociones();
+        mostrar(promociones);
+    }
+
+    private StringBuffer getPromocionesActivas(){
+        StringBuffer promocionesActivas= new StringBuffer();
+        int i =0;
+        for(Promocion promocion: DiarioFacil.getListaPromociones()){
+            if(promocion.isActivo()) {
+                promocionesActivas.append(i+") "+promocion.toString());
+            }
+            i++;
+        }
+        return promocionesActivas;
+    }
+
+    private void verPromocionesActivas(){
+        StringBuffer promocionesActivas = getPromocionesActivas();
+        mostrar(promocionesActivas);
+    }
+
+
+    private StringBuffer getPromocionesInactivas(){
+        StringBuffer promocionesInactivas= new StringBuffer();
+        int i = 0;
+        for(Promocion promocion: DiarioFacil.getListaPromociones()){
+            if(!promocion.isActivo()) {
+                promocionesInactivas.append(i +") " + promocion.toString());
+            }
+            i++;
+        }
+        return promocionesInactivas;
+    }
+
+    private void verPromocionesInactivas(){
+        StringBuffer promocionesInactivas = getPromocionesInactivas();
+        mostrar(promocionesInactivas);
+    }
+
+
+    private StringBuffer formatearOpciones(String[] opciones){
+        StringBuffer formateado = new StringBuffer();
+        int i = 0;
+        for(String opcion: opciones){
+            formateado.append(i + ") " + opcion + "\n");
+            i++;
+        }
+        return formateado;
+    }
+
+    private void verMenuParaModificarPromocion(){
+        String[] opciones = {"Eliminar Promocion","Activar/Desactivar Promocion","Cambiar Descuento De Promocion"};
+        int input = -1;
+        while(input<0 && input>2) {
+            input = inputInt(formatearOpciones(opciones));
+        }
+        switch (input){
+            case 0:
+                eliminarPromocion();
+                break;
+            case 1:
+                activarDesactivar();
+                break;
+            case 2:
+                cambiarDescuento();
+                break;
+        }
+    }
+
+    private void eliminarPromocion(){
+        boolean repetir = true;
+        while(repetir) {
+            StringBuffer insturcciones = new StringBuffer();
+            insturcciones.append("Seleccione el numero de la Promocion que desea eliminar:\n\n");
+            insturcciones.append(getPromociones());
+            int seleccion = -1;
+            while (seleccion < 0 && seleccion >= DiarioFacil.getListaPromociones().size()) {
+                seleccion = inputInt(insturcciones);
+            }
+            DiarioFacil.eliminarPromocion(seleccion);
+            repetir = repetir("Seguir Eliminando Promociones");
+        }
+    }
+
+    private void activarDesactivar(){
+        boolean repetir = true;
+        while(repetir) {
+            StringBuffer promociones = seleccionarPromociones();
+            StringBuffer instrucciones = new StringBuffer();
+
+            instrucciones.append("Seleccione el numero de la Promocion:\n\n");
+            instrucciones.append(promociones);
+
+            int posicion = -1;
+
+            while (posicion < 0 || posicion >= DiarioFacil.listaPromociones.size()) {
+                posicion = inputInt(instrucciones);
+            }
+
+            DiarioFacil.cambiarActivoInactivo(posicion);
+            repetir = repetir("Seguir Activando/Desactivando Promociones");
+        }
+    }
+
+    private void cambiarDescuento(){
+        boolean repetir = true;
+        while(repetir) {
+            StringBuffer promociones = seleccionarPromociones();
+            StringBuffer instrucciones = new StringBuffer();
+
+            instrucciones.append("Seleccione el numero de la Promocion:\n\n");
+            instrucciones.append(promociones);
+
+            int posicion = -1;
+
+            while (posicion < 0 || posicion >= DiarioFacil.listaPromociones.size()) {
+                posicion = inputInt(instrucciones);
+            }
+
+            int descuento = validarDescuento();
+
+            DiarioFacil.ajustarDescuento(posicion, descuento);
+
+            repetir = repetir("Seguir Cambiando Descuentos");
+        }
+    }
+
+    private boolean repetir(String mensaje){
+        String[] opciones = {mensaje,"Salir Al Menu"};
+        int i = validarSwitchCase(opciones);
+        return (i == 0);//0 = Repetir
+    }
+
+    private int validarDescuento(){
+        int descuento = -1;
+        while(descuento<0 || descuento >99){
+            if(descuento==100){
+                mostrar("Regalar productos es malo para el negocio!!");
+            }
+            descuento=inputInt("Ingrese un porcentaje (0-99) para el nuevo descuento");
+        }
+        return descuento;
+    }
+
+    private StringBuffer seleccionarPromociones(){
+        StringBuffer promociones = new StringBuffer();
+        String[] opciones = {"Ver Todas las Promociones","Ver Pronociones Activas", "Ver Promociones Inactivas"};
+        int seleccion = validarSwitchCase(opciones);
+
+        switch(seleccion){
+            case 0:
+                promociones = getPromociones();
+                break;
+            case 1:
+                promociones = getPromocionesActivas();
+                break;
+            case 2:
+                promociones = getPromocionesInactivas();
+                break;
+        }
+
+        return promociones;
+    }
+
+
+    private int validarSwitchCase(String[] opciones){
+        int i = -1;
+        while(i<0 || i >= opciones.length){
+            i = inputInt(formatearOpciones(opciones));
+        }
+        return i;
+    }
+
+    private void seleccionarPromocion(){
+
+    }
+
+    private void mostrar(StringBuffer stringBuffer){
+        JOptionPane.showMessageDialog(null,stringBuffer);
+    }
+
+    private void mostrar(String string){
+        JOptionPane.showMessageDialog(null,string);
+    }
+
+    /**
+     * Muestra todas las facturas registradas en el sistema
+     */
     @Override
     public void verHistorial() {
-
+        StringBuffer historial = generarHistorial();
+        mostrar(historial);
     }
 
+    /**
+     *
+     * @param cedulaUsuario
+     */
     @Override
     public void verHistorialUsuario(int cedulaUsuario) {
-
+        StringBuffer historial = generarHistorialUsuario(cedulaUsuario);
+        mostrar(historial);
     }
 
+    /**
+     *
+     * @param fecha
+     */
     @Override
     public void verHistorialFecha(Calendar fecha) {
-
+        StringBuffer historial = generearHistorialFecha(fecha);
+        mostrar(historial);
     }
 
+    /**
+     *
+     * @param fechaInicio
+     * @param fechaFin
+     */
     @Override
     public void verHistorialFecha(Calendar fechaInicio, Calendar fechaFin) {
-
+        StringBuffer historial = generearHistorialRango(fechaInicio,fechaFin);
+        JOptionPane.showMessageDialog(null,historial);
     }
+
+    /*
+                    _            _
+                   | |          | |
+     _ __ ___   ___| |_ ___   __| | ___  ___
+    | '_ ` _ \ / _ \ __/ _ \ / _` |/ _ \/ __|
+    | | | | | |  __/ || (_) | (_| | (_) \__ \
+    |_| |_| |_|\___|\__\___/ \__,_|\___/|___/
+                           _             _
+                          | |           | |
+      __ _ _   _ _   _  __| | __ _ _ __ | |_ ___  ___
+     / _` | | | | | | |/ _` |/ _` | '_ \| __/ _ \/ __|
+    | (_| | |_| | |_| | (_| | (_| | | | | ||  __/\__ \
+     \__,_|\__, |\__,_|\__,_|\__,_|_| |_|\__\___||___/
+            __/ |
+           |___/ */
+
+
+    /**
+     * TOMA UNA LISTA DE FACTURAS, ITERA CADA ELEMENTO Y LO FORMATEA
+     * EXTRALLENDO LA INFROMACION SIGUIENTE: (Nr de Factura, Cliente, Fecha)
+     * @param listaFacturas LA LISTA DE FACTURAS QUE SERA FORMATEADA
+     * @return STRING BUFFER CON LOS DETALLES DEL HISTORIAL
+     */
+    private StringBuffer generarHistorial(List<Factura> listaFacturas){
+        StringBuffer historial = new StringBuffer();
+        historial.append("Historial\n");
+        for(Factura factura: listaFacturas){
+            historial.append(factura.toString()+"\n");
+        }
+        return historial;
+    }
+
+    /** GENERA UN StringBuffer CON LA INFORMACION DE TODAS LAS FACTURAS EN EL SISTEMA
+     * LLAMA AL METODO DEL MISMO NOMBRE, CON EL PARAMETRO: "DiarioFacil.getListaFacturas()"
+     * @return TODAS EL HISTORIAL DE FACTURAS FORMATEADO
+     */
+    private StringBuffer generarHistorial(){
+        return generarHistorial(DiarioFacil.getListaFacturas());
+    }
+
+    /**
+     * GENERA  TODO EL HISTORIAL DE UN CLIENTE FORMATEADO
+     * @param cedulaUsuario ID DEL CLEINTE BUSCADO
+     * @return StringBuffer TODO EL HISTORIAL
+     */
+    private StringBuffer generarHistorialUsuario(int cedulaUsuario){
+        Usuario usuario = encontrarUsuario(cedulaUsuario);
+        Cliente cliente = (Cliente) usuario;
+        return generarHistorial(cliente.getHistorialDeFacturas());
+    }
+
+    /**
+     *  GENERA TODO EL HISTORIAL DE COMPRAS REALIZADAS EN UNA FECHA ESPECIFICA
+     * @param fecha FECHA QUE APARECE EN LAS FACTURAS
+     * @return TEXTO FORMATEADO
+     */
+    private StringBuffer generearHistorialFecha(Calendar fecha){
+        return generarHistorial(filtrarPorFecha(fecha));
+    }
+
+    /**
+     *  GENERA TODO EL HISTORIAL DE COMPRAS REALIZADAS EN UN RANGO DE FECHAS ESPECIFICA
+     * @param fechaInicio INICIO DEL RANGO
+     * @param fechaFin FIN DEL RANGO
+     * @return TEXTO FORMATEADO
+     */
+    private StringBuffer generearHistorialRango(Calendar fechaInicio, Calendar fechaFin){
+        return generarHistorial(filtrarPorFecha(fechaInicio,fechaFin));
+    }
+
+    /**
+     * GENERA UNA COPIA DE FACTURAS CON LA MISMA FECHA ESPECIFICADA
+     * @param fecha FECHA QUE SE REALIZARON LAS FACTURAS
+     * @return Lista DE FACTURAS CON FECHA = fecha
+     */
+    private List<Factura> filtrarPorFecha(Calendar fecha){
+        List<Factura> listaFiltrada = new ArrayList<>();
+        for(Factura factura: DiarioFacil.getListaFacturas()){
+            if(factura.getCalendar().equals(fecha)){
+                listaFiltrada.add(factura);
+            }
+        }
+        return listaFiltrada;
+    }
+
+    /**
+     * ENCUENTRA TODAS LAS FACTURAS REALIZADAS DENTRO DE UN RANGO DE FECHAS DE INICO Y FIN
+     * @param fechaInicio INICIO DEL RANGO
+     * @param fechaFin FIN DEL RANGO
+     * @return LISTA DE TODAS LAS FACTURAS DENTRO DEL RANGO DE FECHAS
+     */
+    private List<Factura> filtrarPorFecha(Calendar fechaInicio, Calendar fechaFin){
+        List<Factura> listaFiltrada = new ArrayList<>();
+        Calendar fecha;
+
+        for(Factura factura : DiarioFacil.getListaFacturas()){
+            fecha = factura.getCalendar();
+            if (enRangoDeFechas(fecha,fechaInicio,fechaFin)){
+                listaFiltrada.add(factura);
+            }
+        }
+        return listaFiltrada;
+    }
+
+    /**
+     * RETORNA SI UNA FECHA ESTA DENTRO DE UN RANGO
+     * @param fecha FECHA BUSCADA
+     * @param fechaInicio FECHA DE INICIO DEL RANGO
+     * @param fechaFin FECHA DE FIN DEL RANGO
+     * @return RESULTADO (Booleano)
+     */
+    private boolean enRangoDeFechas(Calendar fecha,Calendar fechaInicio, Calendar fechaFin){
+        return (fecha.after(fechaInicio) && fecha.before(fechaFin));
+    }
+
+    /**
+     * BUSCA EN LA LISTA DE DIARIOFACIL POR UN USUARIO QUE TENGA EL NUMERO DE CEDULA ESPECIFICA
+     * @param cedulaUsuario cedula buscada
+     * @return UN OBJECTO TIPO USUARIO DEL LISTADO EN DIARIOFACIL
+     */
+    private Usuario encontrarUsuario(int cedulaUsuario){
+        int posicion = 0;
+        int cedulaActual = 0;
+        boolean encontrado = false;
+        List<Usuario> usuarios = DiarioFacil.getLstUsuarios();
+        while(!encontrado){
+            for (int i = 0; i < usuarios.size(); i++) {
+                cedulaActual = usuarios.get(i).getCedula();
+                if (cedulaActual == cedulaUsuario) {
+                    posicion = i;
+                    encontrado = true;
+                    break;
+                }
+            }
+            if(!encontrado){
+                cedulaUsuario = inputInt("El Usuario con cedula "+cedulaUsuario+" no fue encontrado" +
+                        "por favor ingrese un nuevo numero de cedula");
+            }
+        }
+        return usuarios.get(posicion);
+    }
+
+    /**
+     * ACEPTA INPUT DEL USUARIO Y LO CONVIERTE A UN INT
+     * @param mensaje PARA MOSTRAR USUARIO
+     * @return
+     */
+    private int inputInt(String mensaje){
+        int input = 0;
+        try{
+            input = Integer.parseInt(JOptionPane.showInputDialog(mensaje));
+        }catch (NumberFormatException e){
+            JOptionPane.showMessageDialog(null,"Por Favor Ingrese un numero Entero");
+            return inputInt(mensaje);
+        }
+
+        return input;
+    }
+
+    /** ACEPTA UN INPUT DE UN USUARIOO TOMA UN BufferString de Parametro
+     * VALIDA EL INPUT HASTA QUE SEA VALIDO
+     * @param mensaje SE LE MUESTRA AL USUARIO
+     * @return UN INT
+     */
+    private int inputInt(StringBuffer mensaje){
+        int input = 0;
+        try{
+            input = Integer.parseInt(JOptionPane.showInputDialog(mensaje));
+        }catch (NumberFormatException e){
+            JOptionPane.showMessageDialog(null,"Por Favor Ingrese un numero Entero");
+            return inputInt(mensaje);
+        }
+
+        return input;
+    }
+
+
+
+
 
 }

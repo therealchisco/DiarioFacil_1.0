@@ -5,6 +5,7 @@
  */
 package diarioFacil;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class DiarioFacil {
     public static List<Combos> listaCombos=new ArrayList<>();
     public static List<Promocion> listaPromociones = new ArrayList();
 
+    public static int codigoFactura = 0;
+
+    private static void actualizarCodigoFactura(){
+        codigoFactura = listaFacturas.size();
+    }
 
     public DiarioFacil() {
     }
@@ -68,10 +74,13 @@ public class DiarioFacil {
 
     public static void setListaFacturas(List<Factura> listaFacturas) {
         DiarioFacil.listaFacturas = listaFacturas;
+        DiarioFacil.actualizarCodigoFactura();
     }
+
       
     public static void agregarFactura(Factura f){
         listaFacturas.add(f);
+        actualizarCodigoFactura();
     }
     
     public static List<Combos> getListaCombos() {
@@ -100,6 +109,27 @@ public class DiarioFacil {
 
     }
     
+    public static void agregarPromociones(Promocion p){
+        listaPromociones.add(p);
+
+    }
+
+    public static void eliminarPromocion(int posicion){
+        listaPromociones.remove(posicion);
+        mostrar("El elemento "+posicion+" ha sido removido con exito");
+    }
+
+    public static void cambiarActivoInactivo(int posicion){
+        listaPromociones.get(posicion).cambiarEstado();
+        String activa = listaPromociones.get(posicion).estaActiva();
+        mostrar("La promocion numero "+posicion+" ahora está " + activa );
+    }
+
+    public static void ajustarDescuento(int posicion, int porcentaje){
+        listaPromociones.get(posicion).setDescuento(porcentaje);
+        mostrar("El descuento de la Promocion "+posicion+" ha sido ajustado a "+porcentaje+"%");
+    }
+
     @Override
     public String toString() {
         String memo="";
@@ -108,6 +138,13 @@ public class DiarioFacil {
         }
         return "DiarioFacil " + memo;
     }
-    
+
+    private static void mostrar(String mensaje){
+        JOptionPane.showMessageDialog(null,mensaje);
+    }
+
+    private static void mostrar(StringBuffer mensaje){
+        JOptionPane.showMessageDialog(null,mensaje);
+    }
     
 }

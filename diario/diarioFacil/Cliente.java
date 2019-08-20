@@ -6,6 +6,7 @@
 package diarioFacil;
 
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,102 +15,26 @@ import java.util.List;
  * @author Roberto
  */
 public class Cliente extends Usuario{
-        /*
+
+    /** PARAMETROS
      *
-     d8b   db  .d88b.  d888888b  .d8b.  .d8888.
-     888o  88 .8P  Y8. `~~88~~' d8' `8b 88'  YP
-     88V8o 88 88    88    88    88ooo88 `8bo.
-     88 V8o88 88    88    88    88~~~88   `Y8b.
-     88  V888 `8b  d8'    88    88   88 db   8D
-     VP   V8P  `Y88P'     YP    YP   YP `8888Y' *
-
-      hOLA AQUI HAY UN PAR DE INFOS SOBRE
-      lOS PRINCIPALES CAMBIOS A ESTA CLASE
-      */
-
-     /*
-     1. SE AGREGON LOS ATRIBUTOS
      */
-
-    private  List<Factura> historialDeFacturas = new ArrayList<>();
-    private List<Orden> historialDeOrdenes= new ArrayList<>(); // Tal vez no tan importante
-    private Factura carrito = new Factura(); //
-
-
-    /*
-    2. SE CREARON LOS METODOS
-    */
-
-    public Factura getCarrito(){
-        return carrito;
-    }
-
-    public void limpiarCarrito(){
-        carrito = new Factura();
-    }
-
-    private void agregarAlCarrito(Orden orden){
-        carrito.agregarOrdenes(orden);
-
-    }
-
-    private void completarCarrito(){
-        historialDeFacturas.add(carrito);
-        DiarioFacil.agregarFactura(carrito);
-        limpiarCarrito();
-    }
-
-
-    public List<Factura> getHistorialDeFacturas(){
-        updateFacturas();
-        return historialDeFacturas;
-    }
-
-    /*
-
-    d88888b db    db d888888b .d8888. d888888b d88888b d8b   db d888888b d88888b
-    88'     `8b  d8'   `88'   88'  YP `~~88~~' 88'     888o  88 `~~88~~' 88'
-    88ooooo  `8bd8'     88    `8bo.      88    88ooooo 88V8o 88    88    88ooooo
-    88~~~~~  .dPYb.     88      `Y8b.    88    88~~~~~ 88 V8o88    88    88~~~~~
-    88.     .8P  Y8.   .88.   db   8D    88    88.     88  V888    88    88.
-    Y88888P YP    YP Y888888P `8888Y'    YP    Y88888P VP   V8P    YP    Y88888P
-
-     */
-
-
-    private void updateFacturas(){
-        List<Factura> temp = new ArrayList<>();
-
-        for(Factura factura: DiarioFacil.getListaFacturas()){
-            if(factura.getCliente().equals(this)){
-                temp.add(factura);
-            }
-        }
-        historialDeFacturas= temp;
-    }
-
-    public List<Orden> getHistorialOrdenes(){
-        List<Orden> temp = new ArrayList<>();
-
-        updateFacturas();
-
-        for(Factura f: historialDeFacturas){
-            temp.addAll(f.getListaOrdenes());
-        }
-        return temp;
-    }
-
 
     private boolean frecuente=false;
     private int cantidadCompras=0;
     private String preguntaSeguridad="";
     private String respuestaSeguridad="";
+    private List<Factura> historialDeFacturas = new ArrayList<>(); // Una Factura es una Compra (Coleccion de Ordenes)
+    private List<Orden> historialDeOrdenes= new ArrayList<>(); // Una Orden es una cantidad n de Productos
+    private Factura carrito = new Factura(this,DiarioFacil.codigoFactura); // El Carrito es la Compra
 
 
+    /** CONSTRUCTORES
+     *
+     *
+     */
 
-
-    public Cliente() {
-    }
+    public Cliente() {}
 
     public Cliente( String nombrePersona, String contraPersona, int ced, String pre, String res) {
         super(nombrePersona, contraPersona,ced);
@@ -117,6 +42,18 @@ public class Cliente extends Usuario{
         this.respuestaSeguridad=res;
     }
 
+    /** GETTERS SETTERS
+     *
+     *
+     */
+
+    public Factura getCarrito(){
+        return carrito;
+    }
+
+    public List<Factura> getHistorialDeFacturas(){
+        updateFacturas();
+        return historialDeFacturas;
     public void agregarOrdenAHistorial(Orden orden){
         historialDeOrdenes.add(orden);
     }
@@ -152,6 +89,96 @@ public class Cliente extends Usuario{
     public void setRespuestaSeguridad(String respuestaSeguridad) {
         this.respuestaSeguridad = respuestaSeguridad;
     }
-    
-   
+
+
+    public Factura getUltimaCompra(){
+        return historialDeFacturas.get(cantidadCompras);
+    }
+
+    public void limpiarCarrito(){
+        carrito = new Factura(this,DiarioFacil.codigoFactura);
+    }
+
+    private void agregarAlCarrito(Orden orden){
+        carrito.agregarOrdenes(orden);
+    }
+
+    public void repetirOrden(){
+        limpiarCarrito();
+        Factura ultima = getUltimaCompra();
+        carrito.agregarOrdenes(ultima.getListaOrdenes());
+    }
+
+    public void completarCarrito(){
+        historialDeFacturas.add(carrito);
+        DiarioFacil.agregarFactura(carrito);
+        limpiarCarrito();
+        actualizarCompras();
+    }
+
+    public void cambiarCantidad(int posicion){
+        int cantidad = -1;
+        while(cantidad< 1){
+           cantidad = inputInt("Ingrese Nueva Cantidad");
+        }
+        carrito.getListaOrdenes().get(posicion).setCantidad(cantidad);
+        JOptionPane.showMessageDialog(null,"Cantidad Modificada con Exito");
+    }
+
+
+    private int inputInt(String mensaje){
+        int input = 0;
+        try{
+            input = Integer.parseInt(JOptionPane.showInputDialog(mensaje));
+        }catch (NumberFormatException e){
+            JOptionPane.showMessageDialog(null,"Por Favor Ingrese un numero Entero","Formato Incorrecto",JOptionPane.ERROR_MESSAGE);
+            return inputInt(mensaje);
+        }
+
+        return input;
+    }
+
+    public void agregarOrdenACarrito(Orden orden){
+        carrito.agregarOrdenes(orden);
+    }
+
+    private void actualizarCompras(){
+        cantidadCompras = historialDeFacturas.size();
+        frecuente = cantidadCompras>=5;
+    }
+
+    private void updateFacturas(){
+        List<Factura> temp = new ArrayList<>();
+
+        for(Factura factura: DiarioFacil.getListaFacturas()){
+            if(factura.getCliente().equals(this)){
+                temp.add(factura);
+            }
+        }
+        historialDeFacturas= temp;
+    }
+
+    public List<Orden> getHistorialOrdenes(){
+        List<Orden> temp = new ArrayList<>();
+
+        updateFacturas();
+
+        for(Factura f: historialDeFacturas){
+            temp.addAll(f.getListaOrdenes());
+        }
+        return temp;
+    }
+
+    public void agregarOrdenAHistorial(Orden orden){
+        historialDeOrdenes.add(orden);
+    }
+
+    @Override
+    public String toString() {
+        String frec = " : ";
+        if(frecuente){
+            frec = " frecuente: ";
+        }
+        return "Cliente" + frec + super.toString();
+    }
 }

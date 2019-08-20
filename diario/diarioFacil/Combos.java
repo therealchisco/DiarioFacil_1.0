@@ -60,10 +60,18 @@ public class Combos implements IOfertas{
     }
 
     public double getPrecio() {
+        setPrecio();
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public void setPrecio() {
+        precio = 0;
+        for(Item item: listaItems){
+            precio += (item.getCantidad()*item.getProd().getPrecio());
+        }
+    }
+
+    public void setPrecio(double precio){
         this.precio = precio;
     }
 
