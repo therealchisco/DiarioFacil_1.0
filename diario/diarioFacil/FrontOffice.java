@@ -172,7 +172,7 @@ int codFactura=0;
     public void annadirComboAlCarrito(){
         boolean formatoIncorrecto=false, status=false;
         Combos comboEnviado;
-        int codigoFactura=1, opcion=0,canti=0,confirm=0;
+        int codigoFactura=1, opcion=0,canti=0,confirm=0, exp=0;
         double montoTotal=0;
         do{
             formatoIncorrecto=false;
@@ -183,60 +183,73 @@ int codFactura=0;
             for(Combos comb:DiarioFacil.getListaCombos()){
                 
                     if(opcion==comb.getCodCombo()){
-                        if(comb.isActivo()==false){
-                            JOptionPane.showMessageDialog(null,"Ese combo no está disponible");
-                            formatoIncorrecto=true;
-                        }else{
-                            do{
-                                formatoIncorrecto=false;
-                                
+                        for(Factura f:DiarioFacil.getListaFacturas()){
+                            if(f.getCodFactura()==codigoFactura){
+                                for(Orden o:f.getListaOrdenes()){
+                                    if(o.getCombo().getCodCombo()==opcion){
+                                        JOptionPane.showMessageDialog(null,"El combo ya habia sido añadido");
+                                        exp=1;
+                                    }
+                                }
+                            }
+                        }
+                        if(exp==0){
+                            if(comb.isActivo()==false){
+                                JOptionPane.showMessageDialog(null,"Ese combo no está disponible");
+                                formatoIncorrecto=true;
+                            }else{
                                 do{
                                     formatoIncorrecto=false;
-                                    try{
-                                        
-                                    for(Item it:comb.getListaItems()){
-                                        if(it.getCantidad()==0){
-                                            JOptionPane.showMessageDialog(null,"Hay articulos en el combo que no están disponibles");
-                                        }else{
-                                            confirm=Integer.parseInt(JOptionPane.showInputDialog
-                                            (null,"Combo: "+comb.getNombreCombo()+" Precio: "+comb.getPrecio()+"\n"
-                                            + "¿Está seguro de querer añadir este combo al carrito?\n"
-                                            + "(No=0 Si=1)")); 
 
-                                                if(confirm==1){
-                                                    comboEnviado = comb;
-                                                    if (DiarioFacil.listaFacturas.isEmpty()){
-                                                        Factura f = new Factura(client, codigoFactura);
-                                                        Orden o = new Orden(comboEnviado);
-                                                        f.agregarOrdenes(o);
-                                                        DiarioFacil.agregarFactura(f);
-                                                    }else{
-                                                        for(Factura f:DiarioFacil.listaFacturas){
-                                                            if(f.getCodFactura()==codigoFactura){
-                                                                Orden o = new Orden(comboEnviado);
-                                                                f.agregarOrdenes(o);
+                                    do{
+                                        formatoIncorrecto=false;
+                                        try{
+
+                                        for(Item it:comb.getListaItems()){
+                                            if(it.getCantidad()==0){
+                                                JOptionPane.showMessageDialog(null,"Hay articulos en el combo que no están disponibles");
+                                            }else{
+                                                confirm=Integer.parseInt(JOptionPane.showInputDialog
+                                                (null,"Combo: "+comb.getNombreCombo()+" Precio: "+comb.getPrecio()+"\n"
+                                                + "¿Está seguro de querer añadir este combo al carrito?\n"
+                                                + "(No=0 Si=1)")); 
+
+                                                    if(confirm==1){
+                                                        comboEnviado = comb;
+                                                        if (DiarioFacil.listaFacturas.isEmpty()){
+                                                            Factura f = new Factura(client, codigoFactura);
+                                                            Orden o = new Orden(comboEnviado);
+                                                            f.agregarOrdenes(o);
+                                                            DiarioFacil.agregarFactura(f);
+                                                        }else{
+                                                            for(Factura f:DiarioFacil.listaFacturas){
+                                                                if(f.getCodFactura()==codigoFactura){
+                                                                    Orden o = new Orden(comboEnviado);
+                                                                    f.agregarOrdenes(o);
+                                                                }
                                                             }
                                                         }
+
                                                     }
-
-                                                }
-                                                JOptionPane.showMessageDialog(null,"Su orden ha sido añadida con éxito");
+                                                    JOptionPane.showMessageDialog(null,"Su orden ha sido añadida con éxito");
+                                            }
                                         }
-                                    }
-                                    
-                                    
-
-                                    }catch(NumberFormatException nfe){
-                                        formatoIncorrecto=true;
-                                        JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
-                                    }
-                                }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
-
-                                
 
 
-                            }while(canti<=0 ||formatoIncorrecto==true);
+
+                                        }catch(NumberFormatException nfe){
+                                            formatoIncorrecto=true;
+                                            JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                        }
+                                    }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
+
+
+
+
+                                }while(canti<=0 ||formatoIncorrecto==true);
+                            }
                         }
+                        
                    }
                 
             }
@@ -753,31 +766,37 @@ do{
                     for(Orden o:f.getListaOrdenes()){
                         if(o.getProducto()!=null){
                             lista.append("Lista de productos \n");
-                            for(Orden or:f.getListaOrdenes()){
-                                lista.append("Producto: ");
-                                lista.append(or.getProducto().nombreProd);
-                                lista.append("\t Cantidad:");
-                                lista.append(or.getCantidad());
-                                lista.append("\t Subtotal:");
-                                lista.append(or.getSubtotal());
-                                total+=or.getSubtotal();
-                                lista.append("\n");
+                            if(o.getCantidad()!=0){
+                                for(Orden or:f.getListaOrdenes()){
+                                    lista.append("Producto: ");
+                                    lista.append(or.getProducto().nombreProd);
+                                    lista.append("\t Cantidad:");
+                                    lista.append(or.getCantidad());
+                                    lista.append("\t Subtotal:");
+                                    lista.append(or.getSubtotal());
+                                    total+=or.getSubtotal();
+                                    lista.append("\n");
+                                }
                             }
+                            
                         }
                         if(o.getCombo()!=null){
                             lista.append("Lista de combos \n");
-                            for(Orden or:f.getListaOrdenes()){
-                                lista.append("Nombre de Combo: ");
-                                lista.append(or.getCombo().getNombreCombo());
-                                lista.append("\nProductos en el combo:\n");
-                                for(Item it:or.getCombo().getListaItems()){
-                                    lista.append(it.getProd().nombreProd+"\t");
+                            if(o.getCantidad()!=0){
+                                for(Orden or:f.getListaOrdenes()){
+                                    lista.append("Nombre de Combo: ");
+                                    lista.append(or.getCombo().getNombreCombo());
+                                    lista.append("\nProductos en el combo:\n");
+                                    for(Item it:or.getCombo().getListaItems()){
+                                        lista.append(it.getProd().nombreProd+"\t");
+                                    }
+                                    lista.append("\t Subtotal:");
+                                    lista.append(or.getCombo().getPrecio());
+                                    total+=or.getCombo().getPrecio();
+                                    lista.append("\n");
                                 }
-                                lista.append("\t Subtotal:");
-                                lista.append(or.getCombo().getPrecio());
-                                total+=or.getCombo().getPrecio();
-                                lista.append("\n");
                             }
+                            
                         }
                         lista.append("Total: "+total);
                     }
@@ -806,14 +825,14 @@ do{
                                         + "1) Editar artículos\n"
                                         + "2) Ver artículos en carrito\n"
                                         + "3) Limpiar carrito \n"
-                                            +"4) Completar compra  \n"
-                                            +"5) Volver \n"));
+                                        +"4) Completar compra  \n"
+                                        +"5) Volver \n"));
                                     switch(op){
                                         case 1:editarCarrito();
                                             break;
                                         case 2:verArticulosEnCarrito();
                                             break;
-                                        case 3://limpiar carrito
+                                        case 3:limpiarCarrito();
                                             break;
                                         case 4:
                                            //Completar compra
@@ -838,41 +857,287 @@ do{
                     }while(formatoIncorrecto==true);
 }
 
+    public void cambiarCantidadesEnCarrito(){
+        boolean formatoIncorrecto=false, status=false;
+        Producto productoEnviado;
+        int codigoFactura=1, opcion=0,canti=0,confirm=0;
+        double montoTotal=0;
+        do{
+            formatoIncorrecto=false;
+             
+            try{
+            
+            for(Factura f:DiarioFacil.getListaFacturas()){
+                for(Orden o:f.getListaOrdenes()){
+                    if(f.getCodFactura()==codigoFactura){
+                        opcion=Integer.parseInt(JOptionPane.showInputDialog
+                        (null,"Digite el código del producto que desea cambiar"));
+                        do{
+                            if(opcion==o.getProducto().getCodProducto()){
+                                formatoIncorrecto=false;
+                                    try{
+                                    
+                                        do{
+                                            formatoIncorrecto=false;
+                                            try{
+                                                
+                                                canti=Integer.parseInt(JOptionPane.showInputDialog
+                                                (null,"Ingrese la cantidad de '"+o.getProducto().getNombreProd()+"' que desea cambiar del carrito"));
+                                                if(canti>o.getProducto().getStockActual() || canti<=0){
+                                                    JOptionPane.showMessageDialog(null,"Esa cantidad de productos no se encuentra disponible");
+                                                }
+                                            }catch(NumberFormatException nfe){
+                                            formatoIncorrecto=true;
+                                            JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                            }
+                                        }while(canti>o.getProducto().getStockActual() || canti<=0 || formatoIncorrecto==true);
+                                        
+                                        do{
+                                            formatoIncorrecto=false;
+                                            try{
+                                            confirm=Integer.parseInt(JOptionPane.showInputDialog
+                                            (null,"Producto: "+o.getProducto().getNombreProd()+" Cantidad: "+canti+" Precio: "+canti*o.getProducto().getPrecio()+"\n"
+                                            + "¿Está seguro de querer modificar a esta cantidad?\n"
+                                            + "(No=0 Si=1)")); 
+
+                                                if(confirm==1){
+                                                    o.setCantidad(canti);
+                                                    o.setSubtotal(o.getProducto().getPrecio()*o.getCantidad());
+
+                                                }
+                                                JOptionPane.showMessageDialog(null,"Su orden ha sido actualizada con éxito");
+
+                                            }catch(NumberFormatException nfe){
+                                                formatoIncorrecto=true;
+                                                JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                            }
+                                        }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
+
+                                    }catch(NumberFormatException nfe){
+                                    formatoIncorrecto=true;
+                                    JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                    }
+                            }
+                                
+                            
+
+                        }while(canti<=0 ||formatoIncorrecto==true);
+                    }
+                }
+            }
+            
+              
+            }catch(NumberFormatException nfe){
+                formatoIncorrecto=true;
+                JOptionPane.showMessageDialog
+                (null,"La opción ingresada no tiene el formato correcto"+
+                       ", recuerde usar solo números");
+            }
+        }while(opcion<0 ||formatoIncorrecto==true);
+    } 
+    
+    public void removerArticulosEnCarrito(){
+        boolean formatoIncorrecto=false, status=false;
+        Producto productoEnviado;
+        int codigoFactura=1, opcion=0,confirm=0;
+        double montoTotal=0;
+        do{
+            formatoIncorrecto=false;
+             
+            try{
+            
+            for(Factura f:DiarioFacil.getListaFacturas()){
+                for(Orden o:f.getListaOrdenes()){
+                    if(f.getCodFactura()==codigoFactura){
+                        opcion=Integer.parseInt(JOptionPane.showInputDialog
+                        (null,"Digite el código del producto que desea remover"));
+                        do{
+                            if(opcion==o.getProducto().getCodProducto()){
+                                formatoIncorrecto=false;
+                                    try{
+                                        do{
+                                            formatoIncorrecto=false;
+                                            try{
+                                            confirm=Integer.parseInt(JOptionPane.showInputDialog
+                                            (null,"Producto: "+o.getProducto().getNombreProd()+" Cantidad: "+o.getCantidad()+" Precio: "+o.getCantidad()*o.getProducto().getPrecio()+"\n"
+                                            + "¿Está seguro de querer eliminar este producto?\n"
+                                            + "(No=0 Si=1)")); 
+
+                                                if(confirm==1){
+                                                    o.eliminarProductos();
+
+                                                }
+                                                JOptionPane.showMessageDialog(null,"Su orden ha sido actualizada con éxito");
+
+                                            }catch(NumberFormatException nfe){
+                                                formatoIncorrecto=true;
+                                                JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                            }
+                                        }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
+
+                                    }catch(NumberFormatException nfe){
+                                    formatoIncorrecto=true;
+                                    JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                    }
+                            }
+                                
+                            
+
+                        }while(opcion<=0 ||formatoIncorrecto==true);
+                    }
+                }
+            }
+              
+            }catch(NumberFormatException nfe){
+                formatoIncorrecto=true;
+                JOptionPane.showMessageDialog
+                (null,"La opción ingresada no tiene el formato correcto"+
+                       ", recuerde usar solo números");
+            }
+        }while(opcion<0 ||formatoIncorrecto==true);
+    }
+   
+    public void removerCombosEnCarrito(){
+        boolean formatoIncorrecto=false, status=false;
+        Producto productoEnviado;
+        int codigoFactura=1, opcion=0,confirm=0;
+        double montoTotal=0;
+        do{
+            formatoIncorrecto=false;
+             
+            try{
+            
+            for(Factura f:DiarioFacil.getListaFacturas()){
+                for(Orden o:f.getListaOrdenes()){
+                    if(f.getCodFactura()==codigoFactura){
+                        opcion=Integer.parseInt(JOptionPane.showInputDialog
+                        (null,"Digite el código del combo que desea remover"));
+                        do{
+                            if(opcion==o.getCombo().getCodCombo()){
+                                formatoIncorrecto=false;
+                                    try{
+                                        do{
+                                            formatoIncorrecto=false;
+                                            try{
+                                            confirm=Integer.parseInt(JOptionPane.showInputDialog
+                                            (null,"Combo: "+o.getCombo().getNombreCombo()+" Precio: "+o.getCombo().getPrecio()+"\n"
+                                            + "¿Está seguro de querer eliminar este combo del carrito?\n"
+                                            + "(No=0 Si=1)")); 
+
+                                                if(confirm==1){
+                                                    o.eliminarCombos();
+
+                                                }
+                                                JOptionPane.showMessageDialog(null,"Su orden ha sido actualizada con éxito");
+
+                                            }catch(NumberFormatException nfe){
+                                                formatoIncorrecto=true;
+                                                JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                            }
+                                        }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
+
+                                    }catch(NumberFormatException nfe){
+                                    formatoIncorrecto=true;
+                                    JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                    }
+                            }
+                                
+                            
+
+                        }while(opcion<=0 ||formatoIncorrecto==true);
+                    }
+                }
+            }
+              
+            }catch(NumberFormatException nfe){
+                formatoIncorrecto=true;
+                JOptionPane.showMessageDialog
+                (null,"La opción ingresada no tiene el formato correcto"+
+                       ", recuerde usar solo números");
+            }
+        }while(opcion<0 ||formatoIncorrecto==true);
+    }
+    
+    public void limpiarCarrito(){
+        boolean formatoIncorrecto=false, status=false;
+        Producto productoEnviado;
+        int codigoFactura=1, opcion=0,confirm=0;
+        double montoTotal=0;
+        do{
+            formatoIncorrecto=false;
+             
+            try{
+            
+                for(Factura f:DiarioFacil.getListaFacturas()){
+                    
+                        if(f.getCodFactura()==codigoFactura){        
+                            do{
+                                formatoIncorrecto=false;
+                                try{
+                                confirm=Integer.parseInt(JOptionPane.showInputDialog
+                                (null,"¿Está seguro de querer limpiar el carrito?\n"
+                                + "(No=0 Si=1)")); 
+
+                                    if(confirm==1){
+                                        f.eliminarOrdenes();
+                                    }
+                                    JOptionPane.showMessageDialog(null,"Su orden ha sido actualizada con éxito");
+
+                                }catch(NumberFormatException nfe){
+                                    formatoIncorrecto=true;
+                                    JOptionPane.showMessageDialog(null,"La opción ingresada no tiene el formato correcto, recuerde usar solo números");
+                                }
+                            }while(confirm<0 || confirm>1 ||formatoIncorrecto==true);
+
+                        }
+                    
+                }
+            }catch(NumberFormatException nfe){
+                formatoIncorrecto=true;
+                JOptionPane.showMessageDialog
+                (null,"La opción ingresada no tiene el formato correcto"+
+                       ", recuerde usar solo números");
+            }
+        }while(opcion<0 ||formatoIncorrecto==true);
+    }
+    
     public void editarCarrito(){
     boolean formatoIncorrecto=false;
     int op=0;
     
-    do{
-                        formatoIncorrecto=false;
-                        try{
-                           
-                                do{
-                                    op=Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese una opcion \n"
-                                        + "1) Cambiar cantidades de un artículo\n"
-                                        + "2) Remover un artículo del carrito\n"
-                                            +"3) Volver \n"));
-                                    switch(op){
-                                        case 1://Cambiar cantidades de un artículo
-                                            break;
-                                        case 2://Remover un artículo del carrito
-                                            break;
-                                        case 3://Volver
-                                            break;
-                                       
-                                       
-                                        default:
-                                            JOptionPane.showMessageDialog(null, "Opción no válida");
-                                            break;
-                                    }
-                                }while(op!=3 || op <1 || op>3);
-                            
-                        }catch(NumberFormatException nfe){
-                            formatoIncorrecto=true;
-                            JOptionPane.showMessageDialog(null,"La opción ingresada no"
-                                    + " tiene el formato correcto, recuerde usar solo"
-                                    + " números enteros ");
-                        }
-                    }while(formatoIncorrecto==true);
+            do{
+                formatoIncorrecto=false;
+                try{
+
+                        do{
+                            op=Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese una opcion \n"
+                                + "1) Cambiar cantidades de un artículo\n"
+                                + "2) Remover un artículo del carrito\n"
+                                + "3) Remover un combo del carrito\n"
+                                    +"4) Volver \n"));
+                            switch(op){
+                                case 1:cambiarCantidadesEnCarrito();
+                                    break;
+                                case 2:removerArticulosEnCarrito();
+                                    break;
+                                case 3:removerCombosEnCarrito();
+                                    break;
+                                case 4://Volver
+                                    break;
+
+                                default:
+                                    JOptionPane.showMessageDialog(null, "Opción no válida");
+                                    break;
+                            }
+                        }while(op!=4 || op <1 || op>4);
+
+                }catch(NumberFormatException nfe){
+                    formatoIncorrecto=true;
+                    JOptionPane.showMessageDialog(null,"La opción ingresada no"
+                            + " tiene el formato correcto, recuerde usar solo"
+                            + " números enteros ");
+                }
+            }while(formatoIncorrecto==true);
 }
 
     public void historial(){
